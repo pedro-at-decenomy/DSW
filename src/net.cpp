@@ -2427,6 +2427,10 @@ void CConnman::RelayInv(CInv& inv)
         if (pnode->nVersion >= ActiveProtocol())
             pnode->PushInventory(inv);
     }
+    if(inv.type == MSG_MASTERNODE_PING) {
+        if (!interruptNet.sleep_for(std::chrono::milliseconds(500)))
+            return;
+    }
 }
 
 void CConnman::RecordBytesRecv(uint64_t bytes)
