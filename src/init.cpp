@@ -1403,7 +1403,7 @@ bool AppInit2()
         int port = 0;
         SplitHostPort(hostipArg, port, strHost);
 
-        if (!Lookup(strHost.c_str(), sHostIp, port, false)) {
+        if (!Lookup(strHost.c_str(), sHostIp, 0, false)) {
             return UIError(strprintf(_("HostIP: invalid hostip address %s\n"), hostipArg));
         }
     }

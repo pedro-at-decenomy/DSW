@@ -497,7 +497,7 @@ bool static ConnectSocketDirectly(const CService& addrConnect, SOCKET& hSocketRe
     socklen_t from_len = sizeof(sockaddr);
     if(fromAddr.IsValid() && fromAddr.GetSockAddr((struct sockaddr*)&from_sockaddr, &from_len)) {
         if (::bind(hSocket, (struct sockaddr *)&from_sockaddr, sizeof(struct sockaddr)) == SOCKET_ERROR) {
-            LogPrint(BCLog::NET, "bind hostip %s failed: %s\n", fromAddr.ToString(), NetworkErrorString(WSAGetLastError()));
+            LogPrint(BCLog::NET, "bind hostip %s failed: %s\n", fromAddr.ToStringIP(), NetworkErrorString(WSAGetLastError()));
         }
     }
 
