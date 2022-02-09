@@ -12,6 +12,7 @@
 #include "init.h"
 #include "guiinterfaceutil.h"
 #include "masternode-budget.h"
+#include "masternodeconfig.h"
 #include "masternode-payments.h"
 #include "policy/policy.h"
 #include "script/sign.h"
@@ -1924,6 +1925,9 @@ bool CWallet::AvailableCoins(std::vector<COutput>* pCoins,      // --> populates
 
                 // Skip locked utxo
                 if (IsLockedCoin((*it).first, i) && nCoinType != ONLY_10000) continue;
+
+                // Skip configured masternode collaterals
+                if(masternodeConfig.contains(COutPoint((*it).first, i)) && nCoinType != ONLY_10000) continue;
 
                 // Check if we should include zero value utxo
                 if (pcoin->vout[i].nValue <= 0) continue;
