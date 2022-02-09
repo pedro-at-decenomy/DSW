@@ -1819,13 +1819,8 @@ bool AppInit2()
                 return UIError(strprintf(_("Error reading active masternode configuration file: %s"), strErr));
             }
 
-            if(activeMasternodeConfig.getEntries().size() > 0) {
-                for(auto& ame : activeMasternodeConfig.getEntries()) {
-                    if(!AppInitActiveMasternode(ame)) return false;
-                }
-            } else {
-                std::cout << "XPTO" << std::endl;
-                return UIError(_("Error initializing active masternode configuration "));
+            for(auto& ame : activeMasternodeConfig.getEntries()) {
+                if(!AppInitActiveMasternode(ame)) return false;
             }
         }
     }
