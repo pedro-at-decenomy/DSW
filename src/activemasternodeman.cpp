@@ -12,13 +12,13 @@
 #include <string>
 
 void CActiveMasternodeMan::ManageStatus() {
-    for(auto amn : vActiveMasternodes) {
+    for(auto& amn : vActiveMasternodes) {
         amn.ManageStatus();
     }
 }
 
 void CActiveMasternodeMan::ResetStatus() {
-    for(auto amn : vActiveMasternodes) {
+    for(auto& amn : vActiveMasternodes) {
         amn.ResetStatus();
     }
 }
