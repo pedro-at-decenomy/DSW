@@ -44,7 +44,7 @@ bool CActiveMasternodeConfig::read(std::string& strErr)
         FILE* configFile = fsbridge::fopen(pathActiveMasternodeConfigFile, "a");
         if (configFile != NULL) {
             std::string strHeader = "# Activemasternode config file\n"
-                                    "# Format: strAlias activemasternodeprivkey\n"
+                                    "# Format: alias activemasternodeprivkey\n"
                                     "#\n"
                                     "# Example: mn1 93HaYBVUCYjEMeeH1Y4sBGLALQZE1Yc1K64xiqgX37tGBDQL8Xg\n"
                                     "#\n";
