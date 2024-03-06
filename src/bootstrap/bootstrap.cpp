@@ -4,7 +4,7 @@
 namespace fs = boost::filesystem;
 
 
-bool Boostrap::rmDirectory(const std::string& directory_path) {
+bool Bootstrap::rmDirectory(const std::string& directory_path) {
 
     try {
         // Check if the directory exists
@@ -23,7 +23,7 @@ bool Boostrap::rmDirectory(const std::string& directory_path) {
     return true;
 }
 
-bool Boostrap::isDirectory(const std::string& directory_path) {
+bool Bootstrap::isDirectory(const std::string& directory_path) {
 
     if (fs::exists(directory_path)) return true;
 
@@ -31,7 +31,7 @@ bool Boostrap::isDirectory(const std::string& directory_path) {
 }
 
 // Callback function to write downloaded data to a file
-size_t Boostrap::WriteCallback(void* contents, size_t size, size_t nmemb, void* userp) {
+size_t Bootstrap::WriteCallback(void* contents, size_t size, size_t nmemb, void* userp) {
     size_t total_size = size * nmemb;
     std::ofstream* file = static_cast<std::ofstream*>(userp);
     file->write(static_cast<const char*>(contents), total_size);
@@ -39,7 +39,7 @@ size_t Boostrap::WriteCallback(void* contents, size_t size, size_t nmemb, void* 
 }
 
 // Function to download a file using libcurl
-bool Boostrap::DownloadFile(const std::string& url, const std::string& outputFileName) {
+bool Bootstrap::DownloadFile(const std::string& url, const std::string& outputFileName) {
     CURL* curl = curl_easy_init();
     if (!curl) {
         std::cerr << "Error initializing libcurl." << std::endl;
@@ -70,7 +70,7 @@ bool Boostrap::DownloadFile(const std::string& url, const std::string& outputFil
     return true;
 }
 
-bool Boostrap::extractZip(const std::string& zipFilePath, const std::string& outputFolderPath) {
+bool Bootstrap::extractZip(const std::string& zipFilePath, const std::string& outputFolderPath) {
 
     // Open the zip file
     unzFile zipFile = unzOpen(zipFilePath.c_str());
@@ -150,7 +150,7 @@ bool Boostrap::extractZip(const std::string& zipFilePath, const std::string& out
 
 }
 
-bool Boostrap::ensureOutputFolder(const std::string& outputPath) {
+bool Bootstrap::ensureOutputFolder(const std::string& outputPath) {
     try {
         if (!fs::exists(outputPath)) {
             // Create the directory if it doesn't exist
@@ -169,7 +169,7 @@ bool Boostrap::ensureOutputFolder(const std::string& outputPath) {
     return true;
 }
 
-bool Boostrap::endsWithSlash(const std::string& str) {
+bool Bootstrap::endsWithSlash(const std::string& str) {
     // Check if the string ends with '/'
     return !str.empty() && str.back() == '/';
 }
