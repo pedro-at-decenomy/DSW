@@ -17,7 +17,7 @@
 #define TICKER "__DSW__"
 #endif
 
-class BOOTSTRAP{
+class Bootstrap{
 
 public:
 
