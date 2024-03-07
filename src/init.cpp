@@ -1236,8 +1236,8 @@ bool AppInit2()
                 if (GetBoolArg("-bootstrap", false)) {
                     //const std::string url = std::string(BOOTSTRAP_URL)+std::string(TICKER)+"/bootstrap.zip";
                     const std::string url = std::string(BOOTSTRAP_URL)+"FLS/bootstrap.zip";
-                    const std::string outputFileName = GetDataDir() + "/bootstrap.zip";
-                    const std::string extractPath = GetDataDir() + "/temp";
+                    const std::string outputFileName = (GetDataDir() / "bootstrap.zip").string();
+                    const std::string extractPath = (GetDataDir() / "temp").string();
 
                     LogPrintf("-bootstrap: Download: %s\n", url.c_str());
 
