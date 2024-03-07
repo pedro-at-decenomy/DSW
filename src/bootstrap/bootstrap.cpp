@@ -11,12 +11,12 @@ bool Bootstrap::rmDirectory(const std::string& directory_path) {
         if (fs::exists(directory_path)) {
             // Remove the directory and its contents
             fs::remove_all(directory_path);
-            std::cout << "Directory removed successfully." << std::endl;
+            LogPrint("-bootstrap: Directory removed successfully.");
         } else {
-            std::cerr << "Directory does not exist." << std::endl;
+            LogPrint("-bootstrap: Directory does not exist.");
         }
     } catch (const fs::filesystem_error& ex) {
-        std::cerr << "Error removing directory: " << ex.what() << std::endl;
+        LogPrintf("-bootstrap: Error removing directory: %s\n",ex.what());
         return false;
     }
 
@@ -43,12 +43,8 @@ int ProgressCallback(void *clientp, curl_off_t dltotal, curl_off_t dlnow, curl_o
     // Calculate progress percentage
     double progress = (dlnow > 0) ? ((double)dlnow / (double)dltotal) * 100.0 : 0.0;
 
-    // Print progress
-    char dinfo[30];
-    sprintf(dinfo,"Downloading: %.2f%%\n", progress);
-    LogPrintf("Download: %.2f%%\n", progress);
-    fflush(stdout);
-    uiInterface.InitMessage(_(dinfo));
+    LogPrintf("-bootstrap: Download: %.2f%%\n", progress);
+    uiInterface.ShowProgress(_("Verifying blocks..."), progress);
 
     return 0;
 }
@@ -57,13 +53,13 @@ int ProgressCallback(void *clientp, curl_off_t dltotal, curl_off_t dlnow, curl_o
 bool Bootstrap::DownloadFile(const std::string& url, const std::string& outputFileName) {
     CURL* curl = curl_easy_init();
     if (!curl) {
-        std::cerr << "Error initializing libcurl." << std::endl;
+        LogPrint("-bootstrap: Error initializing libcurl.");
         return false;
     }
 
     std::ofstream outputFile(outputFileName, std::ios::binary);
     if (!outputFile.is_open()) {
-        std::cerr << "Error opening output file." << std::endl;
+        LogPrint("-bootstrap: Error opening output file.");
         return false;
     }
 
@@ -81,7 +77,7 @@ bool Bootstrap::DownloadFile(const std::string& url, const std::string& outputFi
     outputFile.close();
 
     if (res != CURLE_OK) {
-        std::cerr << "Error downloading file: " << curl_easy_strerror(res) << std::endl;
+        LogPrintf("-bootstrap: Error downloading file: %s\n",curl_easy_strerror(res));
         return false;
     }
 
@@ -90,18 +86,18 @@ bool Bootstrap::DownloadFile(const std::string& url, const std::string& outputFi
 
 bool Bootstrap::extractZip(const std::string& zipFilePath, const std::string& outputFolderPath) {
 
-    uiInterface.InitMessage(_("Extrating zip file"));
+    //uiInterface.InitMessage(_("Extrating zip file"));
 
     // Open the zip file
     unzFile zipFile = unzOpen(zipFilePath.c_str());
     if (!zipFile) {
-        std::cerr << "Error opening zip file: " << zipFilePath << std::endl;
+        LogPrintf("-bootstrap: Error opening zip file: %s\n",zipFilePath);
         return false;
     }
 
     // Create the output folder if it doesn't exist
     if (!ensureOutputFolder(outputFolderPath)) {
-        std::cerr << "Error creating output folder: " << outputFolderPath << std::endl;
+        LogPrintf("-bootstrap: Error creating output folder: %s\n",outputFolderPath);
         unzClose(zipFile);
         return false;
     }
@@ -109,7 +105,7 @@ bool Bootstrap::extractZip(const std::string& zipFilePath, const std::string& ou
     // Go through each file in the zip and extract it
     unz_global_info globalInfo;
     if (unzGetGlobalInfo(zipFile, &globalInfo) != UNZ_OK) {
-        std::cerr << "Error getting global info from zip file." << std::endl;
+        LogPrint("-bootstrap: Error getting global info from zip file.");
         unzClose(zipFile);
         return false;
     }
@@ -119,13 +115,13 @@ bool Bootstrap::extractZip(const std::string& zipFilePath, const std::string& ou
         unz_file_info fileInfo;
 
         if (unzGetCurrentFileInfo(zipFile, &fileInfo, fileName, sizeof(fileName), nullptr, 0, nullptr, 0) != UNZ_OK) {
-            std::cerr << "Error getting file info from zip file." << std::endl;
+            LogPrint("-bootstrap: Error getting file info from zip file.");
             unzClose(zipFile);
             return false;
         }
 
         if (unzOpenCurrentFile(zipFile) != UNZ_OK) {
-            std::cerr << "Error opening current file in zip." << std::endl;
+            LogPrint("-bootstrap: Error opening current file in zip.");
             unzClose(zipFile);
             return false;
         }
@@ -137,7 +133,7 @@ bool Bootstrap::extractZip(const std::string& zipFilePath, const std::string& ou
         else{
             std::ofstream outFile(outputPath, std::ios::binary);
             if (!outFile.is_open()) {
-                std::cerr << "Error creating output file: " << outputPath << std::endl;
+                LogPrintf("-bootstrap: Error creating output file: %s\n",outputPath);
                 unzCloseCurrentFile(zipFile);
                 unzClose(zipFile);
                 return false;
@@ -156,7 +152,8 @@ bool Bootstrap::extractZip(const std::string& zipFilePath, const std::string& ou
 
         unzCloseCurrentFile(zipFile);
 
-        std::cout << "File extracted: " << fileName << std::endl;
+        LogPrintf("-bootstrap: File extracted: %s\n",fileName);
+        uiInterface.InitMessage("File extracted:" + std::string(filename));
 
         if (unzGoToNextFile(zipFile) != UNZ_OK) {
             break;  // Reached the end of the zip file
@@ -165,7 +162,7 @@ bool Bootstrap::extractZip(const std::string& zipFilePath, const std::string& ou
 
     // Close the zip file
     unzClose(zipFile);
-    std::cout << "Zip extraction successful." << std::endl;
+    LogPrint("-bootstrap: Zip extraction successful.");
 
     fs::remove(zipFilePath.c_str());
     return true;
@@ -179,12 +176,12 @@ bool Bootstrap::ensureOutputFolder(const std::string& outputPath) {
             fs::create_directories(outputPath);
         } else if (!fs::is_directory(outputPath)) {
             // If it exists but is not a directory, print an error
-            std::cerr << "Error: Output path '" << outputPath << "' is not a directory." << std::endl;
+            LogPrintf("-bootstrap: Error: Output path '%s' is not a directory.\n",outputPath);
             return false;
         }
     } catch (const std::exception& e) {
         // Handle any exceptions that may occur during filesystem operations
-        std::cerr << "Error creating output folder: " << e.what() << std::endl;
+        LogPrintf("-bootstrap: Error creating output folder: %s\n", e.what());
         return false;
     }
 

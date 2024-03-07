@@ -1268,7 +1268,7 @@ bool AppInit2()
                           fs::remove(outputFileName);
                         } else {
                             tries++;
-                            LogPrintf("-bootstrap: Error downloading file");
+                            LogPrintf("-bootstrap: Error downloading file\n");
                         }
                         if(tries > 3) exit(1);
                     }

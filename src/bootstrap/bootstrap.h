@@ -12,6 +12,8 @@
 #include <boost/filesystem/fstream.hpp>
 
 #include "minizip/unzip.h"
+#include "logging.h"
+#include "guiinterface.h"
 
 #ifndef TICKER
 #define TICKER "__DSW__"
