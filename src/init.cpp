@@ -1246,6 +1246,8 @@ bool AppInit2()
                     int tries = 0;
                     bool succeed = false;
                     while(!succeed){
+                        if(++tries > 3) return false;
+
                         if (Bootstrap::DownloadFile(url, outputFileName)) {
                           succeed = true;
                           LogPrintf("-bootstrap: File downloaded successfully \n");
@@ -1261,15 +1263,11 @@ bool AppInit2()
                                   LogPrintf("-bootstrap: Error moving folder: %s\n",e.what());
                               }
                           } else {
-                              LogPrintf("-bootstrap: Error extracting zip file");
+                              LogPrintf("-bootstrap: Error extracting zip file\n");
                           }
 
                           fs::remove(outputFileName);
-                        } else {
-                            tries++;
-                            LogPrintf("-bootstrap: Error downloading file\n");
                         }
-                        if(tries > 3) exit(1);
                     }
                 }
                 #else
