@@ -43,7 +43,7 @@ int ProgressCallback(void *clientp, curl_off_t dltotal, curl_off_t dlnow, curl_o
     // Calculate progress percentage
     double progress = (dlnow > 0) ? ((double)dlnow / (double)dltotal) * 100.0 : 0.0;
 
-    if((uint8)progress % 5 == 0){
+    if((uint8_t)progress % 5 == 0){
         LogPrintf("-bootstrap: Download: %.2f%%\n", progress);
         uiInterface.ShowProgress(_("Verifying blocks..."), progress);    
     }
