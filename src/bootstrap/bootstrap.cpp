@@ -49,7 +49,7 @@ int ProgressCallback(void *clientp, double dltotal, double dlnow, double ultotal
         log_flag = true;
         LogPrintf("-bootstrap: Download: %d\n", (uint8_t)progress);
         uiInterface.ShowProgress(_("Download: "), (uint8_t)progress);    
-    }else log_flag = false;
+    }else if(duration.count() % 2 != 0) log_flag = false;
     
     return 0;
 }
