@@ -47,7 +47,7 @@ int ProgressCallback(void *clientp, double dltotal, double dlnow, double ultotal
     auto duration = std::chrono::duration_cast<std::chrono::seconds>(now.time_since_epoch());
     if(!log_flag && duration.count() % 2 == 0){
         log_flag = true;
-        LogPrintf("-bootstrap: Download: %d\n", (uint8_t)progress);
+        LogPrintf("-bootstrap: Download: %d%%\n", (uint8_t)progress);
         uiInterface.ShowProgress(_("Download: "), (uint8_t)progress);    
     }else if(duration.count() % 2 != 0) log_flag = false;
     
