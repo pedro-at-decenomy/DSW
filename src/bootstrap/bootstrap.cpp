@@ -11,9 +11,9 @@ bool Bootstrap::rmDirectory(const std::string& directory_path) {
         if (fs::exists(directory_path)) {
             // Remove the directory and its contents
             fs::remove_all(directory_path);
-            LogPrint("-bootstrap: Directory removed successfully.");
+            LogPrint(BCLog::BOOTSTRAP,"-bootstrap: Directory removed successfully.\n");
         } else {
-            LogPrint("-bootstrap: Directory does not exist.");
+            LogPrint(BCLog::BOOTSTRAP,"-bootstrap: Directory does not exist.\n");
         }
     } catch (const fs::filesystem_error& ex) {
         LogPrintf("-bootstrap: Error removing directory: %s\n",ex.what());
@@ -53,13 +53,13 @@ int ProgressCallback(void *clientp, curl_off_t dltotal, curl_off_t dlnow, curl_o
 bool Bootstrap::DownloadFile(const std::string& url, const std::string& outputFileName) {
     CURL* curl = curl_easy_init();
     if (!curl) {
-        LogPrint("-bootstrap: Error initializing libcurl.");
+        LogPrint(BCLog::BOOTSTRAP,"-bootstrap: Error initializing libcurl.\n");
         return false;
     }
 
     std::ofstream outputFile(outputFileName, std::ios::binary);
     if (!outputFile.is_open()) {
-        LogPrint("-bootstrap: Error opening output file.");
+        LogPrint(BCLog::BOOTSTRAP,"-bootstrap: Error opening output file.\n");
         return false;
     }
 
@@ -105,7 +105,7 @@ bool Bootstrap::extractZip(const std::string& zipFilePath, const std::string& ou
     // Go through each file in the zip and extract it
     unz_global_info globalInfo;
     if (unzGetGlobalInfo(zipFile, &globalInfo) != UNZ_OK) {
-        LogPrint("-bootstrap: Error getting global info from zip file.");
+        LogPrint(BCLog::BOOTSTRAP,"-bootstrap: Error getting global info from zip file.\n");
         unzClose(zipFile);
         return false;
     }
@@ -115,13 +115,13 @@ bool Bootstrap::extractZip(const std::string& zipFilePath, const std::string& ou
         unz_file_info fileInfo;
 
         if (unzGetCurrentFileInfo(zipFile, &fileInfo, fileName, sizeof(fileName), nullptr, 0, nullptr, 0) != UNZ_OK) {
-            LogPrint("-bootstrap: Error getting file info from zip file.");
+            LogPrint(BCLog::BOOTSTRAP,"-bootstrap: Error getting file info from zip file.\n");
             unzClose(zipFile);
             return false;
         }
 
         if (unzOpenCurrentFile(zipFile) != UNZ_OK) {
-            LogPrint("-bootstrap: Error opening current file in zip.");
+            LogPrint(BCLog::BOOTSTRAP,"-bootstrap: Error opening current file in zip.\n");
             unzClose(zipFile);
             return false;
         }
@@ -162,7 +162,7 @@ bool Bootstrap::extractZip(const std::string& zipFilePath, const std::string& ou
 
     // Close the zip file
     unzClose(zipFile);
-    LogPrint("-bootstrap: Zip extraction successful.");
+    LogPrint(BCLog::BOOTSTRAP,"-bootstrap: Zip extraction successful.\n");
 
     fs::remove(zipFilePath.c_str());
     return true;
