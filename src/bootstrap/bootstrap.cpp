@@ -41,11 +41,11 @@ size_t Bootstrap::WriteCallback(void* contents, size_t size, size_t nmemb, void*
 // Define a function to handle progress updates
 int ProgressCallback(void *clientp, curl_off_t dltotal, curl_off_t dlnow, curl_off_t ultotal, curl_off_t ulnow) {
     // Calculate progress percentage
-    double progress = (dlnow > 0) ? ((double)dlnow / (double)dltotal) * 100.0 : 0.0;
+    float progress = (dlnow > 0) ? ((float)dlnow / (float)dltotal) * 100.0 : 0.0;
 
-    if((uint8_t)progress % 5 == 0){
-        LogPrintf("-bootstrap: Download: %.2f%%\n", progress);
-        uiInterface.ShowProgress(_("Verifying blocks..."), progress);    
+    if((uint8_t)progress % 5 == 0 && (uint8_t)progress != 0){
+        LogPrintf("-bootstrap: Download: %d\n", (uint8_t)progress);
+        uiInterface.ShowProgress(_("Download: "), (uint8_t)progress);    
     }
     
     return 0;
@@ -154,7 +154,6 @@ bool Bootstrap::extractZip(const std::string& zipFilePath, const std::string& ou
 
         unzCloseCurrentFile(zipFile);
 
-        LogPrintf("-bootstrap: File extracted: %s\n",fileName);
         uiInterface.InitMessage("File extracted:" + std::string(fileName));
 
         if (unzGoToNextFile(zipFile) != UNZ_OK) {
