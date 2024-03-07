@@ -153,7 +153,7 @@ bool Bootstrap::extractZip(const std::string& zipFilePath, const std::string& ou
         unzCloseCurrentFile(zipFile);
 
         LogPrintf("-bootstrap: File extracted: %s\n",fileName);
-        uiInterface.InitMessage("File extracted:" + std::string(filename));
+        uiInterface.InitMessage("File extracted:" + std::string(fileName));
 
         if (unzGoToNextFile(zipFile) != UNZ_OK) {
             break;  // Reached the end of the zip file
