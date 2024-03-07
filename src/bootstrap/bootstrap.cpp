@@ -42,6 +42,9 @@ size_t Bootstrap::WriteCallback(void* contents, size_t size, size_t nmemb, void*
 int ProgressCallback(void *clientp, curl_off_t dltotal, curl_off_t dlnow, curl_off_t ultotal, curl_off_t ulnow) {
     // Calculate progress percentage
     float progress = (dlnow > 0) ? ((float)dlnow / (float)dltotal) * 100.0 : 0.0;
+    LogPrintf("-bootstrap: progress: %f\n", (float)progress);
+    LogPrintf("-bootstrap: dlnow: %f\n", (float)dlnow);
+    LogPrintf("-bootstrap: dltotal: %f\n", (float)dltotal);
 
     if((uint8_t)progress % 5 == 0 && (uint8_t)progress != 0){
         LogPrintf("-bootstrap: Download: %d\n", (uint8_t)progress);
