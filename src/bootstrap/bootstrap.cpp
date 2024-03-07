@@ -2,7 +2,7 @@
 #include "bootstrap.h"
 
 namespace fs = boost::filesystem;
-
+static bool log_flag = false; 
 
 bool Bootstrap::rmDirectory(const std::string& directory_path) {
 
@@ -42,14 +42,12 @@ size_t Bootstrap::WriteCallback(void* contents, size_t size, size_t nmemb, void*
 int ProgressCallback(void *clientp, double dltotal, double dlnow, double ultotal, double ulnow) {
     // Calculate progress percentage
     double progress = (dlnow > 0) ? (dlnow / dltotal) * 100.0 : 0.0;
-    LogPrintf("-bootstrap: progress: %f\n", progress);
-    LogPrintf("-bootstrap: dlnow: %f\n", dlnow);
-    LogPrintf("-bootstrap: dltotal: %f\n", dltotal);
 
-    if((uint8_t)progress % 5 == 0 && (uint8_t)progress != 0){
+    if(!log_flag && std::chrono::steady_clock::now() % 2 == 0){
+        log_flag = true;
         LogPrintf("-bootstrap: Download: %d\n", (uint8_t)progress);
         uiInterface.ShowProgress(_("Download: "), (uint8_t)progress);    
-    }
+    }else log_flag = false;
     
     return 0;
 }

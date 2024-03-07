@@ -7,6 +7,7 @@
 #include <string>
 #include <curl/curl.h>
 #include <sys/stat.h>
+#include <chrono>
 
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
