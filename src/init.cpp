@@ -1234,8 +1234,7 @@ bool AppInit2()
                 }
                 #ifdef ENABLE_BOOTSTRAP
                 if (GetBoolArg("-bootstrap", false)) {
-                    //const std::string url = std::string(BOOTSTRAP_URL)+std::string(TICKER)+"/bootstrap.zip";
-                    const std::string url = std::string(BOOTSTRAP_URL)+"FLS/bootstrap.zip";
+                    const std::string url = std::string(BOOTSTRAP_URL)+std::string(TICKER)+"/bootstrap.zip";
                     const std::string outputFileName = (GetDataDir() / "bootstrap.zip").string();
                     const std::string extractPath = (GetDataDir() / "temp").string();
 
