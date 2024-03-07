@@ -43,7 +43,9 @@ int ProgressCallback(void *clientp, double dltotal, double dlnow, double ultotal
     // Calculate progress percentage
     double progress = (dlnow > 0) ? (dlnow / dltotal) * 100.0 : 0.0;
 
-    if(!log_flag && std::chrono::steady_clock::now() % 2 == 0){
+    auto now = std::chrono::steady_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::seconds>(now.time_since_epoch());
+    if(!log_flag && duration.count() % 2 == 0){
         log_flag = true;
         LogPrintf("-bootstrap: Download: %d\n", (uint8_t)progress);
         uiInterface.ShowProgress(_("Download: "), (uint8_t)progress);    
