@@ -43,9 +43,11 @@ int ProgressCallback(void *clientp, curl_off_t dltotal, curl_off_t dlnow, curl_o
     // Calculate progress percentage
     double progress = (dlnow > 0) ? ((double)dlnow / (double)dltotal) * 100.0 : 0.0;
 
-    LogPrintf("-bootstrap: Download: %.2f%%\n", progress);
-    uiInterface.ShowProgress(_("Verifying blocks..."), progress);
-
+    if((uint8)progress % 5 == 0){
+        LogPrintf("-bootstrap: Download: %.2f%%\n", progress);
+        uiInterface.ShowProgress(_("Verifying blocks..."), progress);    
+    }
+    
     return 0;
 }
 
@@ -64,7 +66,7 @@ bool Bootstrap::DownloadFile(const std::string& url, const std::string& outputFi
     }
 
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 1L); // Verify peer's SSL certificate
+    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L); // Disabled - Verify peer's SSL certificate
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &outputFile);
     // Set progress callback and enable progress meter
