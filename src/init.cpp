@@ -1234,36 +1234,44 @@ bool AppInit2()
                 }
                 #ifdef ENABLE_BOOTSTRAP
                 if (GetBoolArg("-bootstrap", false)) {
-                  const std::string url = std::string(BOOTSTRAP_URL)+std::string(TICKER)+"/bootstrap.zip";
-                  const std::string outputFileName = "bootstrap.zip";
-                  const std::string extractPath = "bootstrap_";
+                    //const std::string url = std::string(BOOTSTRAP_URL)+std::string(TICKER)+"/bootstrap.zip";
+                    const std::string url = std::string(BOOTSTRAP_URL)+"FLS/bootstrap.zip";
+                    const std::string outputFileName = GetDataDir() / "bootstrap.zip";
+                    const std::string extractPath = GetDataDir() / "temp";
 
-                  LogPrintf("-bootstrap: Download: %s\n", url.c_str());
+                    LogPrintf("-bootstrap: Download: %s\n", url.c_str());
 
-                  if(Bootstrap::isDirectory(extractPath))
+                    if(Bootstrap::isDirectory(extractPath))
                       Bootstrap::rmDirectory(extractPath);
 
-                  if (Bootstrap::DownloadFile(url, outputFileName)) {
-                      LogPrintf("-bootstrap: File downloaded successfully \n");
+                    int tries = 0;
+                    bool succeed = false;
+                    while(!succeed){
+                        if (Bootstrap::DownloadFile(url, outputFileName)) {
+                          succeed = true;
+                          LogPrintf("-bootstrap: File downloaded successfully \n");
 
-                      if (Bootstrap::extractZip(outputFileName, extractPath)) {
-                          LogPrintf("-bootstrap: Zip file extracted successfully \n");
-                          try {
-                              fs::rename(extractPath+"/blocks", blocksDir);
-                              fs::rename(extractPath+"/chainstate", chainstateDir);
-                              LogPrintf("-bootstrap: Folders moved successfully \n");
-                              fs::remove(extractPath);
-                          } catch (const std::exception& e) {
-                              LogPrintf("-bootstrap: Error moving folder: %s\n",e.what());
+                          if (Bootstrap::extractZip(outputFileName, extractPath)) {
+                              LogPrintf("-bootstrap: Zip file extracted successfully \n");
+                              try {
+                                  fs::rename(extractPath+"/blocks", blocksDir);
+                                  fs::rename(extractPath+"/chainstate", chainstateDir);
+                                  LogPrintf("-bootstrap: Folders moved successfully \n");
+                                  fs::remove(extractPath);
+                              } catch (const std::exception& e) {
+                                  LogPrintf("-bootstrap: Error moving folder: %s\n",e.what());
+                              }
+                          } else {
+                              LogPrintf("-bootstrap: Error extracting zip file");
                           }
-                      } else {
-                          LogPrintf("-bootstrap: Error extracting zip file");
-                      }
 
-                      fs::remove(outputFileName);
-                  } else {
-                      LogPrintf("-bootstrap: Error downloading file");
-                  }
+                          fs::remove(outputFileName);
+                        } else {
+                            tries++;
+                            LogPrintf("-bootstrap: Error downloading file");
+                        }
+                        if(tries > 3) exit(1);
+                    }
                 }
                 #else
                 LogPrintf("-bootstrap: not enabled\n");

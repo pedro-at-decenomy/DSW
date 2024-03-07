@@ -38,6 +38,21 @@ size_t Bootstrap::WriteCallback(void* contents, size_t size, size_t nmemb, void*
     return total_size;
 }
 
+// Define a function to handle progress updates
+int ProgressCallback(void *clientp, curl_off_t dltotal, curl_off_t dlnow, curl_off_t ultotal, curl_off_t ulnow) {
+    // Calculate progress percentage
+    double progress = (dlnow > 0) ? ((double)dlnow / (double)dltotal) * 100.0 : 0.0;
+
+    // Print progress
+    char dinfo[30];
+    sprintf(dinfo,"Downloading: %.2f%%\n", progress);
+    LogPrintf("Download: %.2f%%\n", progress);
+    fflush(stdout);
+    uiInterface.InitMessage(_(dinfo));
+
+    return 0;
+}
+
 // Function to download a file using libcurl
 bool Bootstrap::DownloadFile(const std::string& url, const std::string& outputFileName) {
     CURL* curl = curl_easy_init();
@@ -53,9 +68,12 @@ bool Bootstrap::DownloadFile(const std::string& url, const std::string& outputFi
     }
 
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L); // Do not verify the peer's SSL certificate
+    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 1L); // Verify peer's SSL certificate
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &outputFile);
+    // Set progress callback and enable progress meter
+    curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
+    curl_easy_setopt(curl, CURLOPT_PROGRESSFUNCTION, ProgressCallback);
 
     CURLcode res = curl_easy_perform(curl);
 
@@ -71,6 +89,8 @@ bool Bootstrap::DownloadFile(const std::string& url, const std::string& outputFi
 }
 
 bool Bootstrap::extractZip(const std::string& zipFilePath, const std::string& outputFolderPath) {
+
+    uiInterface.InitMessage(_("Extrating zip file"));
 
     // Open the zip file
     unzFile zipFile = unzOpen(zipFilePath.c_str());
@@ -135,6 +155,8 @@ bool Bootstrap::extractZip(const std::string& zipFilePath, const std::string& ou
 
 
         unzCloseCurrentFile(zipFile);
+
+        std::cout << "File extracted: " << fileName << std::endl;
 
         if (unzGoToNextFile(zipFile) != UNZ_OK) {
             break;  // Reached the end of the zip file
