@@ -932,7 +932,7 @@ UniValue getrewardsinfo(const JSONRPCRequest& request)
 
         if (info_type == "simple") {
 
-            const auto nMasternodingYearlyRewardsROI = (nMNReward * nBlocksPerYear) / nMNCoins;
+            const auto nMasternodingYearlyRewardsROI = static_cast<double>(nMNReward * nBlocksPerYear) / nMNCoins;
 
             obj.push_back(Pair("staking_roi", strprintf("%4.2f%%", nStakingROI * 100)));
             obj.push_back(Pair("smooth_staking_roi", strprintf("%4.2f%%", nSmoothStakingROI * 100)));
