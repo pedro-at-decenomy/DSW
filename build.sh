@@ -238,6 +238,7 @@ docker buildx build \
 	--build-arg NAME=$UI_NAME \
 	--build-arg BASE_NAME=$BASE_NAME \
 	--build-arg TARGET=$TARGET \
+	--build-arg GITHUB_USER=$GITHUB_USER \
 	-f $WALLET_DOCKER_FILE.tmp \
 	-t $image_tag \
 	 .
