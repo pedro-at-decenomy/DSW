@@ -1252,6 +1252,7 @@ unsigned int GetNextWorkRequiredPOSV10(const CBlockIndex* pIndexLast, bool silen
     
     // Fetch the target block spacing time and timespan
     const auto& nTargetSpacing = consensus.nTargetSpacing;
+    const auto& nTimeSlotLength = consensus.nTimeSlotLength;
 
     std::cout << "GetNextWorkRequiredPOSV10 nTargetSpacing: " << nTargetSpacing << std::endl;
     
@@ -1259,6 +1260,11 @@ unsigned int GetNextWorkRequiredPOSV10(const CBlockIndex* pIndexLast, bool silen
     int64_t nActualSpacing = nHeight > 1 ? pIndexLast->GetBlockTime() - pIndexLast->pprev->GetBlockTime() : nTargetSpacing;
     
     std::cout << "GetNextWorkRequiredPOSV10 nActualSpacing: " << nActualSpacing << std::endl;
+
+    // Limit the upper bound of the actual spacing
+    nActualSpacing = std::min(nActualSpacing, 2 * nTargetSpacing - nTimeSlotLength);
+
+    std::cout << "GetNextWorkRequiredPOSV10 nActualSpacing limited: " << nActualSpacing << std::endl;
 
     const int nBlocksPerDay = DAY_IN_SECONDS / nTargetSpacing;
 
@@ -1269,8 +1275,8 @@ unsigned int GetNextWorkRequiredPOSV10(const CBlockIndex* pIndexLast, bool silen
 
     std::cout << "GetNextWorkRequiredPOSV10 nAccumulatedSpacing: " << nAccumulatedSpacing << std::endl;
 
-    int64_t nKp = 30;
-    int64_t nKi = 300;
+    int64_t nKp = 120;
+    int64_t nKi = 30;
 
     std::cout << "GetNextWorkRequiredPOSV10 Kp factor: " << nKp << std::endl;
     std::cout << "GetNextWorkRequiredPOSV10 Ki factor: " << nKi << std::endl;
