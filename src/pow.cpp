@@ -16,6 +16,7 @@
 #include "util.h"
 
 #include <math.h>
+#include "clientversion.h"
 
 unsigned int GetNextWorkRequiredPOW(const CBlockIndex* pindexLast)
 {
@@ -1243,6 +1244,7 @@ unsigned int GetNextWorkRequiredPOSV10(const CBlockIndex* pIndexLast, bool silen
     const auto& consensus = params.GetConsensus();
 
     std::cout << "============================================================" << std::endl;
+    std::cout << CLIENT_BUILD << std::endl;
     
     // Get the current block height
     const auto nPrevHeight = pIndexLast->nHeight;
