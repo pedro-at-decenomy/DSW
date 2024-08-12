@@ -1272,11 +1272,22 @@ unsigned int GetNextWorkRequiredPOSV10(const CBlockIndex* pIndexLast, bool silen
 
     std::cout << "GetNextWorkRequiredPOSV10 nAccumulatedSpacing: " << nAccumulatedSpacing << std::endl;
 
+    const int nBlocksPerWeek = WEEK_IN_SECONDS / nTargetSpacing;
+
+    int64_t nAccumulatedTargetSpacing2 = WEEK_IN_SECONDS;
+    int64_t nAccumulatedSpacing2 = nHeight > nBlocksPerWeek ?
+        pIndexLast->GetBlockTime() - chainActive[nPrevHeight - nBlocksPerWeek]->GetBlockTime() :
+        nAccumulatedTargetSpacing2;
+
+    std::cout << "GetNextWorkRequiredPOSV10 nAccumulatedSpacing2: " << nAccumulatedSpacing2 << std::endl;
+
     int64_t nKp = 60;
-    int64_t nKi = 1;
+    int64_t nKi = 10;
+    int64_t nKi2 = 100;
 
     std::cout << "GetNextWorkRequiredPOSV10 Kp factor: " << nKp << std::endl;
     std::cout << "GetNextWorkRequiredPOSV10 Ki factor: " << nKi << std::endl;
+    std::cout << "GetNextWorkRequiredPOSV10 Ki2 factor: " << nKi2 << std::endl;
 
     uint256 bnNew;
     bnNew.SetCompact(pIndexLast->nBits);
@@ -1293,11 +1304,27 @@ unsigned int GetNextWorkRequiredPOSV10(const CBlockIndex* pIndexLast, bool silen
 
     std::cout << "GetNextWorkRequiredPOSV10 nBits Ki: " << GetDifficulty(bnNew.GetCompact()) << std::endl;
 
+    bnNew *= nAccumulatedSpacing2 + ((nKi2 - 1) * nAccumulatedTargetSpacing2);
+    bnNew /= nKi2 * nAccumulatedTargetSpacing2;
+
+    std::cout << "GetNextWorkRequiredPOSV10 nBits Ki2: " << GetDifficulty(bnNew.GetCompact()) << std::endl;
+
     // Ensure the new difficulty does not exceed the minimum allowed by consensus
     if (bnNew > consensus.posLimit)
         bnNew = consensus.posLimit;
 
     const CBlockIndex* BlockReading = pIndexLast;
+
+    for (unsigned int i = 0; BlockReading && BlockReading->nHeight > 0; i++) {
+        if(BlockReading->nTime < (pIndexLast->nTime - WEEK_IN_SECONDS)) {
+            std::cout << "GetNextWorkRequiredPOSV10 7d nBlocks: " << i << std::endl;
+            break;
+        }
+
+        BlockReading = BlockReading->pprev;
+    }
+
+    BlockReading = pIndexLast;
 
     for (unsigned int i = 0; BlockReading && BlockReading->nHeight > 0; i++) {
         if(BlockReading->nTime < (pIndexLast->nTime - DAY_IN_SECONDS)) {
