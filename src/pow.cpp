@@ -1272,8 +1272,8 @@ unsigned int GetNextWorkRequiredPOSV10(const CBlockIndex* pIndexLast, bool silen
 
     std::cout << "GetNextWorkRequiredPOSV10 nAccumulatedSpacing: " << nAccumulatedSpacing << std::endl;
 
-    int64_t nKp = 100;
-    int64_t nKi = 10;
+    int64_t nKp = 60;
+    int64_t nKi = 1;
 
     std::cout << "GetNextWorkRequiredPOSV10 Kp factor: " << nKp << std::endl;
     std::cout << "GetNextWorkRequiredPOSV10 Ki factor: " << nKi << std::endl;
