@@ -1261,7 +1261,7 @@ unsigned int GetNextWorkRequiredPOSV10(const CBlockIndex* pIndexLast, bool silen
     // Retarget the difficulty based on a PID controller based function
     int64_t nActualSpacing = nHeight > 1 ? pIndexLast->GetBlockTime() - pIndexLast->pprev->GetBlockTime() : nTargetSpacing;
     
-    std::cout << "GetNextWorkRequiredPOSV10 nActualSpacing: " << nActualSpacing << std::endl;
+    std::cout << "GetNextWorkRequiredPOSV10 nActualSpacing: " << nActualSpacing << "/" << nTargetSpacing << std::endl;
 
     const int nBlocksPerDay = DAY_IN_SECONDS / nTargetSpacing;
 
@@ -1270,7 +1270,7 @@ unsigned int GetNextWorkRequiredPOSV10(const CBlockIndex* pIndexLast, bool silen
         pIndexLast->GetBlockTime() - chainActive[nPrevHeight - nBlocksPerDay]->GetBlockTime() :
         nAccumulatedTargetSpacing;
 
-    std::cout << "GetNextWorkRequiredPOSV10 nAccumulatedSpacing: " << nAccumulatedSpacing << std::endl;
+    std::cout << "GetNextWorkRequiredPOSV10 nAccumulatedSpacing: " << nAccumulatedSpacing << "/" << nAccumulatedTargetSpacing << std::endl;
 
     const int nBlocksPerWeek = WEEK_IN_SECONDS / nTargetSpacing;
 
@@ -1279,7 +1279,7 @@ unsigned int GetNextWorkRequiredPOSV10(const CBlockIndex* pIndexLast, bool silen
         pIndexLast->GetBlockTime() - chainActive[nPrevHeight - nBlocksPerWeek]->GetBlockTime() :
         nAccumulatedTargetSpacing2;
 
-    std::cout << "GetNextWorkRequiredPOSV10 nAccumulatedSpacing2: " << nAccumulatedSpacing2 << std::endl;
+    std::cout << "GetNextWorkRequiredPOSV10 nAccumulatedSpacing2: " << nAccumulatedSpacing2 << "/" << nAccumulatedTargetSpacing2 << std::endl;
 
     int64_t nKp = 60;
     int64_t nKi = 10;
