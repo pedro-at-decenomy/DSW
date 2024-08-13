@@ -1283,7 +1283,7 @@ unsigned int GetNextWorkRequiredPOSV10(const CBlockIndex* pIndexLast, bool silen
 
     int64_t nKp = 60;
     int64_t nKi = 10;
-    int64_t nKi2 = 100;
+    int64_t nKi2 = 10;
 
     std::cout << "GetNextWorkRequiredPOSV10 Kp factor: " << nKp << std::endl;
     std::cout << "GetNextWorkRequiredPOSV10 Ki factor: " << nKi << std::endl;
