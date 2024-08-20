@@ -1865,20 +1865,8 @@ bool CWallet::AvailableCoins(std::vector<COutput>* pCoins,      // --> populates
     if (pCoins) pCoins->clear();
     const bool fCoinsSelected = (coinControl != nullptr) && coinControl->HasSelected();
 
-    auto& params = Params();
-    auto& consensus = params.GetConsensus();
-
-    auto nStakeMinDepth = 
-            consensus.NetworkUpgradeActive(chainActive.Height(), Consensus::UPGRADE_STAKE_MIN_DEPTH_V2) ?
-            consensus.nStakeMinDepthV2 : 
-            consensus.nStakeMinDepth;
-
-    auto nCurrentMasternodeCollateral = CMasternode::GetCurrentMasternodeCollateral();
-    auto nNextWeekMasternodeCollateral = CMasternode::GetNextWeekMasternodeCollateral();
-
     {
         LOCK2(cs_main, cs_wallet);
-        
         for (auto it = mapWallet.begin(); it != mapWallet.end(); ++it) {
             const uint256& wtxid = it->first;
             const CWalletTx* pcoin = &(*it).second;
@@ -1889,27 +1877,21 @@ bool CWallet::AvailableCoins(std::vector<COutput>* pCoins,      // --> populates
                 continue;
 
             // Check min depth requirement for stake inputs
-            if (nCoinType == STAKEABLE_COINS && 
-                nDepth < nStakeMinDepth) continue;
+            if (nCoinType == STAKEABLE_COINS &&
+                nDepth
+                    <
+                (Params().GetConsensus().NetworkUpgradeActive(chainActive.Height(), Consensus::UPGRADE_STAKE_MIN_DEPTH_V2) ?
+                    Params().GetConsensus().nStakeMinDepthV2 : Params().GetConsensus().nStakeMinDepth)) continue;
 
             for (unsigned int i = 0; i < pcoin->vout.size(); i++) {
 
-                const auto txOut = pcoin->vout[i];
-                const auto nValue = txOut.nValue;
-                const auto scriptPubKey = txOut.scriptPubKey;
-
-                // Check if we should include zero value utxo
-                if (nValue <= 0) continue;
-
                 // Check for only 10k utxo
-                if (nCoinType == ONLY_10000 && 
-                    nValue != nCurrentMasternodeCollateral && 
-                    nValue != nNextWeekMasternodeCollateral) continue;
+                if (nCoinType == ONLY_10000 && !CMasternode::CheckMasternodeCollateral(pcoin->vout[i].nValue)) continue;
 
                 // Check if the utxo was spent.
                 if (IsSpent(wtxid, i)) continue;
 
-                isminetype mine = IsMine(txOut);
+                isminetype mine = IsMine(pcoin->vout[i]);
 
                 // Check If not mine
                 if (mine == ISMINE_NO) continue;
@@ -1918,15 +1900,18 @@ bool CWallet::AvailableCoins(std::vector<COutput>* pCoins,      // --> populates
                 if (mine == ISMINE_WATCH_ONLY && coinControl && !coinControl->fAllowWatchOnly) continue;
 
                 // Skip locked utxo
-                if (nCoinType != ONLY_10000 && IsLockedCoin(wtxid, i)) continue;
+                if (IsLockedCoin((*it).first, i) && nCoinType != ONLY_10000) continue;
 
                 // Skip configured masternode collaterals
-                if (nCoinType != ONLY_10000 && masternodeConfig.contains(COutPoint(wtxid, i))) continue;
+                if (masternodeConfig.contains(COutPoint((*it).first, i)) && nCoinType != ONLY_10000) continue;
 
-                if (fCoinsSelected && !coinControl->fAllowOtherInputs && !coinControl->IsSelected(COutPoint(wtxid, i)))
+                // Check if we should include zero value utxo
+                if (pcoin->vout[i].nValue <= 0) continue;
+
+                if (fCoinsSelected && !coinControl->fAllowOtherInputs && !coinControl->IsSelected(COutPoint((*it).first, i)))
                     continue;
 
-                bool solvable = IsSolvable(*this, scriptPubKey);
+                bool solvable = IsSolvable(*this, pcoin->vout[i].scriptPubKey);
 
                 bool spendable = ((mine & ISMINE_SPENDABLE) != ISMINE_NO) ||
                         (((mine & ISMINE_WATCH_ONLY) != ISMINE_NO) && (coinControl && coinControl->fAllowWatchOnly && solvable));
