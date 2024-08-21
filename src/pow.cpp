@@ -1694,19 +1694,19 @@ unsigned int GetNextWorkRequiredPOSV13(const CBlockIndex* pIndexLast, bool silen
 
     int64_t nKp = 240;
     int64_t nKi = 20;
-    int64_t nKi2 = 10;
+    int64_t nKi2 = 20;
 
-    if (nAccumulatedSpacing > nAccumulatedTargetSpacing &&
-        nAccumulatedSpacing2 < nAccumulatedTargetSpacing2
-    ) {
-        nKi *= 10;
-    }
+    // if (nAccumulatedSpacing > nAccumulatedTargetSpacing &&
+    //     nAccumulatedSpacing2 < nAccumulatedTargetSpacing2
+    // ) {
+    //     nKi *= 10;
+    // }
 
-    if (nAccumulatedSpacing < nAccumulatedTargetSpacing &&
-        nAccumulatedSpacing2 > nAccumulatedTargetSpacing2
-    ) {
-        nKi2 *= 10;
-    }
+    // if (nAccumulatedSpacing < nAccumulatedTargetSpacing &&
+    //     nAccumulatedSpacing2 > nAccumulatedTargetSpacing2
+    // ) {
+    //     nKi2 *= 10;
+    // }
 
     std::cout << "GetNextWorkRequiredPOSV13 Kp factor: " << nKp << std::endl;
     std::cout << "GetNextWorkRequiredPOSV13 Ki factor: " << nKi << std::endl;
