@@ -1693,8 +1693,8 @@ unsigned int GetNextWorkRequiredPOSV13(const CBlockIndex* pIndexLast, bool silen
     std::cout << "GetNextWorkRequiredPOSV13 nAccumulatedSpacing2: " << nAccumulatedSpacing2 << "/" << nAccumulatedTargetSpacing2 << std::endl;
 
     int64_t nKp = 240;
-    int64_t nKi = 20;
-    int64_t nKi2 = 20;
+    int64_t nKi = 10;
+    int64_t nKi2 = 10;
 
     // if (nAccumulatedSpacing > nAccumulatedTargetSpacing &&
     //     nAccumulatedSpacing2 < nAccumulatedTargetSpacing2
