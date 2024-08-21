@@ -1780,6 +1780,8 @@ unsigned int GetNextWorkRequiredPOSV13(const CBlockIndex* pIndexLast, bool silen
 
 unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHeader* pblock, bool silent)
 {
+    LOCK(cs_main);
+
     const auto& params = Params();
     const auto& consensus = params.GetConsensus();
     const auto nHeight = pindexLast->nHeight + 1;
