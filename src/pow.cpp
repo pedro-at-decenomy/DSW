@@ -1814,9 +1814,9 @@ unsigned int GetNextWorkRequiredPOSV14(const CBlockIndex* pIndexLast, bool silen
     
     std::cout << "GetNextWorkRequiredPOSV14 nActualSpacing: " << nActualSpacing << "/" << nTargetSpacing << std::endl;
 
-    const int nBlocksPerWeek = WEEK_IN_SECONDS / nTargetSpacing;
+    const int nBlocksPerWeek = DAY_IN_SECONDS / nTargetSpacing;
 
-    int64_t nAccumulatedTargetSpacing = WEEK_IN_SECONDS;
+    int64_t nAccumulatedTargetSpacing = DAY_IN_SECONDS;
     int64_t nAccumulatedSpacing = nHeight > nBlocksPerWeek ?
         pIndexLast->GetBlockTime() - chainActive[nPrevHeight - nBlocksPerWeek]->GetBlockTime() :
         nAccumulatedTargetSpacing;
