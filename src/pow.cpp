@@ -1830,11 +1830,14 @@ unsigned int GetNextWorkRequiredPOSV14(const CBlockIndex* pIndexLast, bool silen
     int64_t nMultiplier = 10000;
 
     // target adjustment
-    nActualSpacing = nActualSpacing * nMultiplier; 
-    nTargetSpacing = (nAccumulatedTargetSpacing * nTargetSpacing * nMultiplier) / nAccumulatedSpacing; 
+    nActualSpacing = nActualSpacing * nMultiplier;
+    nTargetSpacing = (nAccumulatedTargetSpacing * nTargetSpacing * nMultiplier) / nAccumulatedSpacing;  // ^1
+    nTargetSpacing = nAccumulatedTargetSpacing * nTargetSpacing / nAccumulatedSpacing;                  // ^2
+    nTargetSpacing = nAccumulatedTargetSpacing * nTargetSpacing / nAccumulatedSpacing;                  // ^3
+    nTargetSpacing = nAccumulatedTargetSpacing * nTargetSpacing / nAccumulatedSpacing;                  // ^4
 
     std::cout << "GetNextWorkRequiredPOSV14 nTargetSpacing adjusted: " << nTargetSpacing << std::endl;
-
+ 
     uint256 bnNew;
     bnNew.SetCompact(pIndexLast->nBits);
 
