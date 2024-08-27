@@ -1814,39 +1814,64 @@ unsigned int GetNextWorkRequiredPOSV14(const CBlockIndex* pIndexLast, bool silen
     
     std::cout << "GetNextWorkRequiredPOSV14 nActualSpacing: " << nActualSpacing << "/" << nTargetSpacing << std::endl;
 
-    const int nBlocksPerWeek = DAY_IN_SECONDS / nTargetSpacing;
+    const int nBlocksPerDay = DAY_IN_SECONDS / nTargetSpacing;
 
-    int64_t nAccumulatedTargetSpacing = DAY_IN_SECONDS;
-    int64_t nAccumulatedSpacing = nHeight > nBlocksPerWeek ?
+    int64_t nDayAccumulatedTargetSpacing = DAY_IN_SECONDS;
+    int64_t nDayAccumulatedSpacing = nHeight > nBlocksPerDay ?
+        pIndexLast->GetBlockTime() - chainActive[nPrevHeight - nBlocksPerDay]->GetBlockTime() :
+        nDayAccumulatedTargetSpacing;
+
+    std::cout << "GetNextWorkRequiredPOSV14 nDayAccumulatedSpacing: " << nDayAccumulatedSpacing << "/" << nDayAccumulatedTargetSpacing << std::endl;
+
+    const int nBlocksPerWeek = WEEK_IN_SECONDS / nTargetSpacing;
+
+    int64_t nWeekAccumulatedTargetSpacing = WEEK_IN_SECONDS;
+    int64_t nWeekAccumulatedSpacing = nHeight > nBlocksPerWeek ?
         pIndexLast->GetBlockTime() - chainActive[nPrevHeight - nBlocksPerWeek]->GetBlockTime() :
-        nAccumulatedTargetSpacing;
+        nWeekAccumulatedTargetSpacing;
 
-    std::cout << "GetNextWorkRequiredPOSV14 nAccumulatedSpacing: " << nAccumulatedSpacing << "/" << nAccumulatedTargetSpacing << std::endl;
+    std::cout << "GetNextWorkRequiredPOSV14 nWeekAccumulatedSpacing: " << nWeekAccumulatedSpacing << "/" << nWeekAccumulatedTargetSpacing << std::endl;
+
+    int64_t nMultiplier = 1000; // adjusts it at a millisecond level
+
+    nActualSpacing = nActualSpacing * nMultiplier;
+
+    // 24h target adjustment
+    int64_t nDayTargetSpacing = (nDayAccumulatedTargetSpacing * nTargetSpacing * nMultiplier) / nDayAccumulatedSpacing; // ^1
+    nDayTargetSpacing = nDayAccumulatedTargetSpacing * nDayTargetSpacing / nDayAccumulatedSpacing;                      // ^2
+    nDayTargetSpacing = nDayAccumulatedTargetSpacing * nDayTargetSpacing / nDayAccumulatedSpacing;                      // ^3
+    nDayTargetSpacing = nDayAccumulatedTargetSpacing * nDayTargetSpacing / nDayAccumulatedSpacing;                      // ^4
+
+    std::cout << "GetNextWorkRequiredPOSV14 nDayTargetSpacing adjusted: " << nDayTargetSpacing << " ms" << std::endl;
+
+    // 7 days target adjustment
+    int64_t nWeekTargetSpacing = (nWeekAccumulatedTargetSpacing * nTargetSpacing * nMultiplier) / nWeekAccumulatedSpacing;  // ^1
+    nWeekTargetSpacing = nWeekAccumulatedTargetSpacing * nWeekTargetSpacing / nWeekAccumulatedSpacing;                      // ^2
+    nWeekTargetSpacing = nWeekAccumulatedTargetSpacing * nWeekTargetSpacing / nWeekAccumulatedSpacing;                      // ^3
+    nWeekTargetSpacing = nWeekAccumulatedTargetSpacing * nWeekTargetSpacing / nWeekAccumulatedSpacing;                      // ^4
+
+    std::cout << "GetNextWorkRequiredPOSV14 nWeekTargetSpacing adjusted: " << nWeekTargetSpacing << " ms" << std::endl;
 
     int64_t nK = 120;
+    int64_t nK2 = 240;
 
     std::cout << "GetNextWorkRequiredPOSV14 K factor: " << nK << std::endl;
-
-    int64_t nMultiplier = 10000;
-
-    // target adjustment
-    nActualSpacing = nActualSpacing * nMultiplier;
-    nTargetSpacing = (nAccumulatedTargetSpacing * nTargetSpacing * nMultiplier) / nAccumulatedSpacing;  // ^1
-    nTargetSpacing = nAccumulatedTargetSpacing * nTargetSpacing / nAccumulatedSpacing;                  // ^2
-    nTargetSpacing = nAccumulatedTargetSpacing * nTargetSpacing / nAccumulatedSpacing;                  // ^3
-    nTargetSpacing = nAccumulatedTargetSpacing * nTargetSpacing / nAccumulatedSpacing;                  // ^4
-
-    std::cout << "GetNextWorkRequiredPOSV14 nTargetSpacing adjusted: " << nTargetSpacing << std::endl;
+    std::cout << "GetNextWorkRequiredPOSV14 K2 factor: " << nK2 << std::endl;
  
     uint256 bnNew;
     bnNew.SetCompact(pIndexLast->nBits);
 
     std::cout << "GetNextWorkRequiredPOSV14 nBits start: " << GetDifficulty(bnNew.GetCompact()) << std::endl;
 
-    bnNew *= nActualSpacing + ((nK - 1) * nTargetSpacing);
-    bnNew /= nK * nTargetSpacing;
+    bnNew *= nActualSpacing + ((nK - 1) * nDayTargetSpacing);
+    bnNew /= nK * nDayTargetSpacing;
 
-    std::cout << "GetNextWorkRequiredPOSV14 nBits K: " << GetDifficulty(bnNew.GetCompact()) << std::endl;
+    std::cout << "GetNextWorkRequiredPOSV14 nBits nK: " << GetDifficulty(bnNew.GetCompact()) << std::endl;
+
+    bnNew *= nActualSpacing + ((nK2 - 1) * nWeekTargetSpacing);
+    bnNew /= nK2 * nWeekTargetSpacing;
+
+    std::cout << "GetNextWorkRequiredPOSV14 nBits nK2: " << GetDifficulty(bnNew.GetCompact()) << std::endl;
 
     // Ensure the new difficulty does not exceed the minimum allowed by consensus
     if (bnNew > consensus.posLimit)
