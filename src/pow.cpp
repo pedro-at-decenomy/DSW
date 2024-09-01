@@ -1853,7 +1853,7 @@ unsigned int GetNextWorkRequiredPOSV14(const CBlockIndex* pIndexLast, bool silen
     std::cout << "GetNextWorkRequiredPOSV14 nWeekTargetSpacing adjusted: " << nWeekTargetSpacing << " ms" << std::endl;
 
     int64_t nK = 120;
-    int64_t nK2 = 240;
+    int64_t nK2 = 120;
 
     std::cout << "GetNextWorkRequiredPOSV14 K factor: " << nK << std::endl;
     std::cout << "GetNextWorkRequiredPOSV14 K2 factor: " << nK2 << std::endl;
