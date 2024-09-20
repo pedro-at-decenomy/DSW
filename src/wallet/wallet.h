@@ -328,6 +328,9 @@ public:
     bool fCombineDust;
     CAmount nAutoCombineThreshold;
 
+    // MAX_AMOUNT_LOADED_RECORDS
+    int nLoadedRecordsMaxCount;
+
     CWallet();
     CWallet(std::string strWalletFileIn);
     ~CWallet();
@@ -335,7 +338,7 @@ public:
     bool isMultiSendEnabled();
     void setMultiSendDisabled();
 
-    boost::unordered_map<uint256, CWalletTx, uint256CheapHasher> mapWallet;
+    mutable boost::unordered_map<uint256, CWalletTx, uint256CheapHasher> mapWallet;
     mutable boost::unordered_set<uint256, uint256CheapHasher> setWallet;
 
     std::list<CAccountingEntry> laccentries;
