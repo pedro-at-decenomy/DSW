@@ -1971,9 +1971,12 @@ bool CWallet::AvailableCoins(std::vector<COutput>* pCoins,      // --> populates
             }
         }
 
-        for (auto it = vErase.begin(); it != vErase.end(); ++it) {
-            setWallet.erase(*it);
-        }
+        if(vErase.size() > 0) {
+            for (auto& h : vErase) {
+                setWallet.erase(h);
+            }
+            setWallet.rehash(0);
+        } 
 
         return (pCoins && pCoins->size() > 0);
     }
