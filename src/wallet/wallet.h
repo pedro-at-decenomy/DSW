@@ -84,6 +84,11 @@ static const bool DEFAULT_DISABLE_WALLET = false;
 
 extern const char * DEFAULT_WALLET_DAT;
 
+// Maximum amount of loaded records in ram in the first load.
+// If the user has more and want to load them:
+// TODO, add load on demand in pages (not every tx loaded all the time into the records list).
+#define MAX_AMOUNT_LOADED_RECORDS 100000
+
 class CAccountingEntry;
 class CCoinControl;
 class COutput;
@@ -315,7 +320,7 @@ public:
     bool fUseCustomFee;
     CAmount nCustomFee;
 
-    //MultiSend
+    // MultiSend
     std::vector<std::pair<std::string, int> > vMultiSend;
     bool fMultiSendStake;
     bool fMultiSendMasternodeReward;
@@ -324,7 +329,7 @@ public:
     int nLastMultiSendHeight;
     std::vector<std::string> vDisabledAddresses;
 
-    //Auto Combine Inputs
+    // Auto Combine Inputs
     bool fCombineDust;
     CAmount nAutoCombineThreshold;
 
